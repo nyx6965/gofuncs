@@ -1,6 +1,6 @@
-# Coralis
+# msh
 
-Coralis is a lightweight, user-friendly command-line interface designed for basic system interactions and task management.
+msh is a lightweight, user-friendly command-line interface designed for basic system interactions and task management.
 
 ## Getting Started
 
@@ -11,7 +11,7 @@ Coralis is a lightweight, user-friendly command-line interface designed for basi
 
 ### Compilation
 
-To compile Coralis, run:
+To compile msh, run:
 
 Create a build directory:
 
@@ -29,19 +29,18 @@ Then use make:
 make
 ```
 
-### Running MicroShell
+### Running msh
 
-To start Coralis, simply run:
+To start msh, simply run:
 
 ```
-./coralis
+./msh
 ```
 ## Contributing
 
-Contributions to Coralis are welcome. Please feel free to submit pull requests or open issues for bugs and feature requests.
+Contributions to msh are welcome.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
-Would you like me to explain or elaborate on any part of this README?
