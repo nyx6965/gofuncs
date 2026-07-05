@@ -3,12 +3,26 @@
 
 #include <stdbool.h>
 
-typedef struct args_t {
-  int argc;
-  char **argv;
-  bool has_operator;
-} args_t;
+typedef enum {
+  TOKEN_COMMAND,
+  TOKEN_SINGLE_QUOTE,
+  TOKEN_DOUBLE_QUOTE,
+  TOKEN_EOF
+} token_type;
 
-args_t *args_parse_arguments(char *input);
+typedef struct {
+  const char *start;
+  const char *current;
+  int line;
+} scanner;
 
+typedef struct {
+  token_type type;
+  const char *start;
+  int length;
+  int line;
+} token;
+
+void args_scanner(char *input);
+token args_token_scan(scanner *s);
 #endif

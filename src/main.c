@@ -1,6 +1,5 @@
 #include "../include/utils.h"
 
-#include "../include/builtin.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -25,14 +24,16 @@ int main(void) {
     printf("$ ");
     input = utils_get_input();
 
-    if (builtin_check(input)) {
-      continue;
-    };
-    utils_execute_program(input);
-    //args_parse_arguments(input);
+    // if (builtin_check(input)) {
+    //    continue;
+    //  };
+
+    args_scanner(input);
+    //utils_execute_program(input);
     free(buffer);
     free(input);
   } while (true);
 
+  // args_parse_arguments(input);
   return EXIT_SUCCESS;
 };

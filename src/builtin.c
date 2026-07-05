@@ -7,13 +7,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../include/args.h"
-#include "../include/builtin.h"
 #include "../include/helper.h"
 #include "../include/utils.h"
 
 #define SIZE 1024
 
+/*
 const char *builtin[] = {"echo", "type", "exit", "pwd", "cd"};
 
 bool builtin_check(char *input) {
@@ -57,6 +56,7 @@ bool builtin_check(char *input) {
 
   return false;
 };
+
 void builtin_cd(args_t *args) {
 
   if (args->argc == 1) {
@@ -143,3 +143,5 @@ bool builtin_type(char *arg) {
 
   return false;
 };
+
+*/

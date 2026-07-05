@@ -1,6 +1,4 @@
 #include "../include/utils.h"
-#include "../include/args.h"
-#include <cmath>
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdbool.h>
@@ -59,15 +57,15 @@ void utils_get_path(char *cmd) {
 char *utils_get_command(char *input) {
   size_t size = strlen(input);
 
-  char *cmd = (char *)malloc((30 + 1) * sizeof(char));
-
   int char_counter = 0;
+  char *cmd = (char *)malloc((5 + 1) * sizeof(char));
+
   if (cmd == NULL) {
     fprintf(stderr, "Memory allocation failed\n");
     exit(1);
   }
 
-  for (int i = 0; i < size; ++i) {
+  for (int i = 0; i < 5; ++i) {
     if (input[i] == '"' || input[i] == '\'')
       continue;
 
@@ -82,19 +80,20 @@ char *utils_get_command(char *input) {
 void utils_execute_program(char *input) {
 
   char *cmd = utils_get_command(input);
+  printf("%s", cmd);
   if (strlen(cmd) == 0) {
     return;
   };
 
-  args_t *args = calloc(1, sizeof(args_t));
-  args = args_parse_arguments(input);
+  // args_t *args = args_parse_arguments(input);
 
   char buffer[BUFFER_SIZE];
 
-  if (args->has_operator) {
-    utils_redirect_stdout(buffer, args);
-    return;
-  }
+  // if (args->has_operator) {
+  // utils_redirect_stdout(buffer, args);
+  // return;
+  // }
+
   int fd[2];
 
   int fd_pipe = pipe(fd);
@@ -105,21 +104,24 @@ void utils_execute_program(char *input) {
     return;
   };
 
+  /*
   if (cpid == 0) {
     dup2(fd[1], STDOUT_FILENO);
-    execvp(cmd, args->argv);
+// execvp(cmd, args->argv);
     printf("%s: command not found\n", cmd);
   } else {
     int status;
     waitpid(cpid, &status, 0);
     size_t size = read(fd[0], buffer, BUFFER_SIZE);
     buffer[size] = '\0';
-    close(fd[0]);
-    close(fd[1]);
+  //  close(fd[0]);
+   // close(fd[1]);
     printf("%s", buffer);
   };
+*/
 };
 
+/*
 void utils_redirect_stdout(const char *buffer, const args_t *args) {
 
   bool is_filename = false;
@@ -149,12 +151,5 @@ void utils_redirect_stdout(const char *buffer, const args_t *args) {
     cmd++;
   };
   printf("%s\n", filename);
-
 };
-void utils_append_file(const char *filename, const bool append,
-                       const bool overwrite){
-
-
-
-
-};
+*/
