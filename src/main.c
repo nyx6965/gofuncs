@@ -20,7 +20,8 @@ int main(void) {
     if (getcwd(buffer, SIZE) == NULL) {
       fprintf(stderr, "error: Could not get path");
       exit(EXIT_FAILURE);
-    }
+    };
+
     printf("$ ");
     input = utils_get_input();
 
