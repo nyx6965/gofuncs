@@ -8,6 +8,17 @@
 
 static token args_token_make(scanner *s, token_type type);
 
+
+static char *helper_strtrim(char *str) {
+  char *end;
+  while (*str == ' ' || *str == '\t' || *str == '\r') str++;
+  if (*str == 0) return str;
+  end = str + strlen(str) - 1;
+  while (*end == ' ' || *end == '\t' || *end == '\r') end--;
+  *(end + 1) = 0;
+  return str;
+}
+
 static void helper_skip_whitespace(scanner *s) {
   for (;;) {
     char c = *s->current;
@@ -28,15 +39,16 @@ static bool helper_ispace(scanner *s) {
 }
 
 static token handle_commands(scanner *s, token_type type) {
-  while ((*s->current != ' ' || *s->current != '\t' || *s->current != '\r') &&
+  while (*s->current != ' ' && *s->current != '\t' && *s->current != '\r' &&
          *s->current != '\0') {
-    if (helper_ispace(s)) {
-      s->pos++;
-      return args_token_make(s, type);
-    }
     s->current++;
   }
-
+  s->pos++;
+  if (*s->current == '\0') {
+    return args_token_make(s, type);
+  }
+  s->current++;
+  helper_skip_whitespace(s);
   return args_token_make(s, type);
 };
 
@@ -79,7 +91,7 @@ token args_token_scan(scanner *s) {
   char c = s->current[-1];
 
   if (s->pos == 0) {
-    // return handle_commands(s, TOKEN_COMMAND);
+    return handle_commands(s, TOKEN_COMMAND);
   }
 
   switch (c) {
@@ -87,8 +99,8 @@ token args_token_scan(scanner *s) {
     return helper_double(s);
   case '\'':
     return helper_single(s);
-    // default:
-    // return handle_commands(s, TOKEN_ARGUMENTS);
+  default:
+    return handle_commands(s, TOKEN_ARGUMENTS);
   };
   return args_token_make(s, TOKEN_EOF);
 };
@@ -113,17 +125,13 @@ void args_scanner(char *input) {
   int pos = -1;
   for (int i = 0; i < strlen(input); i++) {
     token token = args_token_scan(s);
-    /*
-        if (token.pos != pos) {
-          printf("%4d ", token.pos);
-          pos = token.pos;
-        } else {
-          printf("   | ");
-        }
 
-        */
+    char *m = (char *)malloc(token.length * sizeof(char));
+    strncpy(m, token.start, token.length);
+    char *trimmed = helper_strtrim(m);
+    printf("%2d <<%s>>\n", token.type, trimmed);
 
-    printf("%2d <<%.*s>>\n", token.type, token.length, token.start);
+    free(m);
     if (token.type == TOKEN_EOF)
       break;
   }
