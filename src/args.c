@@ -8,6 +8,20 @@
 
 static token args_token_make(scanner *s, token_type type);
 
+static void helper_skip_whitespace(scanner *s) {
+  for (;;) {
+    char c = *s->current;
+    switch (c) {
+    case ' ':
+    case '\r':
+    case '\t':
+      s->current++;
+      break;
+    default:
+      return;
+    }
+  }
+}
 static bool helper_ispace(scanner *s) {
   char c = *s->current;
   return c == ' ' || c == '\t' || c == '\r' || c == '\0';
@@ -27,29 +41,24 @@ static token handle_commands(scanner *s, token_type type) {
 };
 
 static token helper_double(scanner *s) {
-  while (*s->current != '"' || *s->current != '\0') {
-    if (*s->current == '"' || *s->current == '\0') {
-      s->pos++;
-      return args_token_make(s, TOKEN_DOUBLE_QUOTE);
-    }
+  while (*s->current != '"' && *s->current != '\0')
     s->current++;
-  }
 
+  s->pos++;
+  s->current++;
+  helper_skip_whitespace(s);
   return args_token_make(s, TOKEN_DOUBLE_QUOTE);
 }
-static token helper_single(scanner *s) {
-  while (!helper_ispace(s) && *s->current++ != '\'') {
-    if (*s->current++ == '\'') {
-      s->pos++;
-      return args_token_make(s, TOKEN_SINGLE_QUOTE);
-    }
-    s->current++;
-  }
 
+static token helper_single(scanner *s) {
+  while (*s->current != '\'' && *s->current != '\0')
+    s->current++;
+
+  s->pos++;
   s->current++;
+  helper_skip_whitespace(s);
   return args_token_make(s, TOKEN_SINGLE_QUOTE);
 }
-
 
 static token args_token_make(scanner *s, token_type type) {
   token token;
@@ -77,10 +86,9 @@ token args_token_scan(scanner *s) {
   case '"':
     return helper_double(s);
   case '\'':
-  *s->current++;
     return helper_single(s);
-  default:
-    return handle_commands(s, TOKEN_ARGUMENTS);
+    // default:
+    // return handle_commands(s, TOKEN_ARGUMENTS);
   };
   return args_token_make(s, TOKEN_EOF);
 };
@@ -114,9 +122,9 @@ void args_scanner(char *input) {
         }
 
         */
-      printf("%2d <<%.*s>>\n", token.type, token.length, token.start);
 
-      if (token.type == TOKEN_EOF)
+    printf("%2d <<%.*s>>\n", token.type, token.length, token.start);
+    if (token.type == TOKEN_EOF)
       break;
   }
 }
