@@ -26,4 +26,6 @@ typedef struct {
 
 void args_scanner(char *input);
 token args_token_scan(scanner *s);
+
+token args_token_make(scanner *s, token_type type);
 #endif

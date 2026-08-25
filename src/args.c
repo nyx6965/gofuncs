@@ -1,42 +1,10 @@
-#include <stdio.h>
-
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../include/args.h"
-
-static token args_token_make(scanner *s, token_type type);
-
-
-static char *helper_strtrim(char *str) {
-  char *end;
-  while (*str == ' ' || *str == '\t' || *str == '\r') str++;
-  if (*str == 0) return str;
-  end = str + strlen(str) - 1;
-  while (*end == ' ' || *end == '\t' || *end == '\r') end--;
-  *(end + 1) = 0;
-  return str;
-}
-
-static void helper_skip_whitespace(scanner *s) {
-  for (;;) {
-    char c = *s->current;
-    switch (c) {
-    case ' ':
-    case '\r':
-    case '\t':
-      s->current++;
-      break;
-    default:
-      return;
-    }
-  }
-}
-static bool helper_ispace(scanner *s) {
-  char c = *s->current;
-  return c == ' ' || c == '\t' || c == '\r' || c == '\0';
-}
+#include "../include/helper.h"
 
 static token handle_commands(scanner *s, token_type type) {
   while (*s->current != ' ' && *s->current != '\t' && *s->current != '\r' &&
@@ -52,9 +20,22 @@ static token handle_commands(scanner *s, token_type type) {
   return args_token_make(s, type);
 };
 
-static token helper_double(scanner *s) {
-  while (*s->current != '"' && *s->current != '\0')
-    s->current++;
+static token handle_double_qoutes(scanner *s) {
+
+  while (*s->current != '"' && *s->current != '\0' ){
+               if (*(s->current + 1) != '\0'&& *(s->current + 1) == '"') {
+                   s->current++;
+                   if (*(s->current + 1) != '\0'&& *(s->current + 1) == '"') {
+                       s->current++;
+                       s->pos = s->pos+2;
+                   }if ((*(s->current + 1) != '\0'&& *(s->current + 1) == ' ')) {
+
+                       break;
+                   }
+               }
+       s->current++;
+  }
+
 
   s->pos++;
   s->current++;
@@ -62,17 +43,26 @@ static token helper_double(scanner *s) {
   return args_token_make(s, TOKEN_DOUBLE_QUOTE);
 }
 
-static token helper_single(scanner *s) {
+static token handle_single_qoutes(scanner *s) {
   while (*s->current != '\'' && *s->current != '\0')
     s->current++;
 
   s->pos++;
   s->current++;
+  if (*s->current == '\'') {
+    s->current++;
+    while (*s->current != '\'' && *s->current != '\0')
+      s->current++;
+
+    s->pos++;
+    s->current++;
+  }
+
   helper_skip_whitespace(s);
   return args_token_make(s, TOKEN_SINGLE_QUOTE);
 }
 
-static token args_token_make(scanner *s, token_type type) {
+token args_token_make(scanner *s, token_type type) {
   token token;
   token.type = type;
   token.start = s->start;
@@ -96,9 +86,9 @@ token args_token_scan(scanner *s) {
 
   switch (c) {
   case '"':
-    return helper_double(s);
+    return handle_double_qoutes(s);
   case '\'':
-    return helper_single(s);
+    return handle_single_qoutes(s);
   default:
     return handle_commands(s, TOKEN_ARGUMENTS);
   };
@@ -126,13 +116,14 @@ void args_scanner(char *input) {
   for (int i = 0; i < strlen(input); i++) {
     token token = args_token_scan(s);
 
+    if (token.type == TOKEN_EOF)
+      break;
+
     char *m = (char *)malloc(token.length * sizeof(char));
     strncpy(m, token.start, token.length);
     char *trimmed = helper_strtrim(m);
     printf("%2d <<%s>>\n", token.type, trimmed);
 
     free(m);
-    if (token.type == TOKEN_EOF)
-      break;
   }
 }

@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include "./args.h"
+
 char *utils_get_input();
 void utils_get_path(char *cmd);
 char *utils_get_command(char *input);
